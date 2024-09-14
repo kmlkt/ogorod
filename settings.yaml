@@ -1,0 +1,17 @@
+sites:
+    - repository: gi
+      localpath: ddd
+      domain: ggg
+      url: gggg
+    - repository: gi2
+      localpath: ddd2
+      domain: ggg2
+      url: gggg
+    - repository: s
+      localpath: d
+      domain: f
+      url: g
+    - repository: a
+      localpath: a
+      domain: a
+      url: a
