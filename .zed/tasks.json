@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Apply",
+    "command": "go run ."
+  },
+  {
+    "label": "Add",
+    "command": "go run . -- add"
+  }
+]

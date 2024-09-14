@@ -1,9 +1,0 @@
-sites:
-    - repository: gi
-      localpath: ddd
-      domain: ggg
-      url: gggg
-    - repository: gi2
-      localpath: ddd2
-      domain: ggg2
-      url: gggg
