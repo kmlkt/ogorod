@@ -4,10 +4,54 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/go-git/go-git/v5"
 	"gopkg.in/yaml.v3"
 )
+
+var sitesEnabled = "/etc/nginx/sites-enabled/ogorod"
+
+func CreateNginxConfig(sites []Site) {
+	servers := map[string][]Site{}
+	for _, site := range sites {
+		servers[site.Domain] = append(servers[site.Domain], site)
+	}
+	file, err := os.OpenFile(sitesEnabled, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	for serverName, serverSites := range servers {
+		fmt.Fprintf(file, `
+server {
+	listen 80;
+	server_name %s;
+	index index.html;
+		`, serverName)
+		for _, site := range serverSites {
+			fmt.Fprintf(file, `
+	location %s {
+		alias %s;
+		try_files $uri $uri/ =404;
+	}
+`, site.URL, site.LocalPath)
+		}
+		fmt.Fprint(file, "}")
+	}
+}
+
+func RestartNginx() {
+	cmd := exec.Command("systemctl", "restart", "nginx")
+	fmt.Print(cmd)
+	if cmd.Err != nil {
+		log.Fatal(cmd.Err)
+	}
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 type Site struct {
 	Repository string
@@ -20,7 +64,7 @@ type SitesConfig struct {
 	Sites []Site
 }
 
-func gitclone(url string) {
+func GitClone(url string) {
 	destination := "./repository"
 	_, err := git.PlainClone(destination, false, &git.CloneOptions{
 		URL: url,
@@ -31,13 +75,13 @@ func gitclone(url string) {
 	fmt.Println("Repository cloned successfully!")
 }
 
-func clonesitefromsettings(config SitesConfig) {
+func CloneSiteFromSettings(config SitesConfig) {
 	for _, site := range config.Sites {
-		gitclone(site.URL)
+		GitClone(site.URL)
 	}
 }
 
-func addnewsites(config SitesConfig) {
+func AddNewSites(config SitesConfig) {
 	var repository string
 	var localpath string
 	var domain string

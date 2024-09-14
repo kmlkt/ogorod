@@ -1,4 +1,4 @@
-module mod
+module github.com/kmlkt/ogorod/v2
 
 go 1.23.0
 
