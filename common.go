@@ -15,3 +15,8 @@ func StupidHandle(err error) {
 		log.Fatal(err)
 	}
 }
+
+func LocalPath(p Site) string {
+	path := "/" + p.Domain + "/" + p.URL
+	return path
+}

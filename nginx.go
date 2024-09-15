@@ -9,6 +9,10 @@ import (
 )
 
 func (c Config) ConfigureNginx() {
+	if runtime.GOOS != "linux" {
+		log.Println("NGINX can be restarted automatically only on linux")
+		return
+	}
 	servers := map[string][]Site{}
 	for _, site := range c.Sites {
 		servers[site.Domain] = append(servers[site.Domain], site)
@@ -29,7 +33,7 @@ server {
 		alias %s;
 		try_files $uri $uri/ =404;
 	}
-`, site.URL, site.LocalPath)
+`, site.URL, LocalPath(site))
 		}
 		fmt.Fprint(file, "}")
 	}
