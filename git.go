@@ -12,7 +12,7 @@ func (c Config) Download() {
 }
 
 func (s Site) Download() {
-	if PathExists(s.LocalPath) {
+	if PathExists(LocalPath(s)) {
 		s.GitReset()
 	} else {
 		s.GitClone()
@@ -20,7 +20,7 @@ func (s Site) Download() {
 }
 
 func (s Site) GitReset() {
-	repo, err := git.PlainOpen(s.LocalPath)
+	repo, err := git.PlainOpen(LocalPath(s))
 	StupidHandle(err)
 	repo.Fetch(&git.FetchOptions{})
 	worktree, err := repo.Worktree()
@@ -34,7 +34,7 @@ func (s Site) GitReset() {
 }
 
 func (s Site) GitClone() {
-	_, err := git.PlainClone(s.LocalPath, false, &git.CloneOptions{
+	_, err := git.PlainClone(LocalPath(s), false, &git.CloneOptions{
 		URL:           s.Repository,
 		ReferenceName: plumbing.ReferenceName(s.Branch),
 	})
