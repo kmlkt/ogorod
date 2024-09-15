@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"os/exec"
 )
 
 func PathExists(path string) bool {
@@ -17,6 +18,12 @@ func StupidHandle(err error) {
 }
 
 func LocalPath(p Site) string {
-	path := "/" + p.Domain + "/" + p.URL
+	path := "/" + p.Domain + "/" + p.URL + "/"
 	return path
+}
+
+func BuildSite(p Site) {
+	cmd := exec.Command(LocalPath(p) + "build.sh")
+	_, err := cmd.Output()
+	StupidHandle(err)
 }
