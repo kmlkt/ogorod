@@ -36,7 +36,7 @@ func CliAdd() {
 			url = url + slicesiteaddress[i] + "/"
 		}
 	}
-	if !strings.HasPrefix(repository, "https://") || !strings.HasPrefix(repository, "http://") {
+	if !strings.HasPrefix(repository, "https://") && !strings.HasPrefix(repository, "http://") {
 		repository = "https://" + repository
 	}
 	config := ReadConfig()
