@@ -27,3 +27,11 @@ func BuildSite(p Site) {
 	_, err := cmd.Output()
 	StupidHandle(err)
 }
+
+func CheckBuild(p Site) {
+	if _, err := os.Stat(LocalPath(p) + "build.sh"); os.IsNotExist(err) {
+		BuildSite(p)
+	} else {
+		return
+	}
+}
