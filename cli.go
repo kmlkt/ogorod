@@ -8,10 +8,16 @@ import (
 )
 
 func CliRun() {
+	if slices.Contains(os.Args, "githubtoken") {
+		GetToken()
+	}
 	if slices.Contains(os.Args, "add") {
 		CliAdd()
-	} else {
+	}
+	if slices.Contains(os.Args, "apply") {
 		CliApply()
+	} else {
+		os.Exit(1)
 	}
 }
 
