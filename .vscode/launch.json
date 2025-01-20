@@ -23,6 +23,16 @@
             "args": ["add"],
             "asRoot": true,
             "console": "integratedTerminal",
+        },       
+        {
+            "name": "Get ports",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": ".",
+            "args": ["getports"],
+            "asRoot": true,
+            "console": "integratedTerminal",
         },
         {
             "name": "Token",

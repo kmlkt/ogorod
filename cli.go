@@ -16,6 +16,9 @@ func CliRun() {
 	}
 	if slices.Contains(os.Args, "apply") {
 		CliApply()
+	}
+	if slices.Contains(os.Args, "getports") {
+		portscan()
 	} else {
 		os.Exit(1)
 	}
