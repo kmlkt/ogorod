@@ -18,7 +18,15 @@ func CliRun() {
 		CliApply()
 	}
 	if slices.Contains(os.Args, "getports") {
-		portscan()
+		PortScan()
+	}
+	if slices.Contains(os.Args, "getfreeport") {
+		port, err := GetFreePort()
+		if err != nil {
+			fmt.Println("Ошибка:", err)
+		} else {
+			fmt.Printf("Свободный порт: %d\n", port)
+		}
 	} else {
 		os.Exit(1)
 	}

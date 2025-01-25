@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-func worker(ports, results chan int) {
+func Worker(ports, results chan int) {
 	for p := range ports {
 		address := fmt.Sprintf("scanme.nmap.org:%d", p)
 		conn, err := net.Dial("tcp", address)
@@ -19,12 +19,12 @@ func worker(ports, results chan int) {
 	}
 }
 
-func portscan() {
+func PortScan() {
 	ports := make(chan int, 100)
 	results := make(chan int)
 	var openports []int
 	for i := 0; i < cap(ports); i++ {
-		go worker(ports, results)
+		go Worker(ports, results)
 	}
 	go func() {
 		for i := 1; i <= 1024; i++ {
