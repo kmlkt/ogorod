@@ -6,6 +6,8 @@ import (
 	"os/exec"
 )
 
+const PARENT_DIR = "/sites"
+
 func PathExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
@@ -18,7 +20,7 @@ func StupidHandle(err error) {
 }
 
 func LocalPath(p Site) string {
-	path := "/" + p.Domain + "/" + p.URL + "/"
+	path := PARENT_DIR + "/" + p.Domain + "/" + p.URL + "/"
 	return path
 }
 

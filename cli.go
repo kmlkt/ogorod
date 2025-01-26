@@ -10,17 +10,13 @@ import (
 func CliRun() {
 	if slices.Contains(os.Args, "githubtoken") {
 		GetToken()
-	}
-	if slices.Contains(os.Args, "add") {
+	} else if slices.Contains(os.Args, "add") {
 		CliAdd()
-	}
-	if slices.Contains(os.Args, "apply") {
+	} else if slices.Contains(os.Args, "apply") {
 		CliApply()
-	}
-	if slices.Contains(os.Args, "getports") {
+	} else if slices.Contains(os.Args, "getports") {
 		PortScan()
-	}
-	if slices.Contains(os.Args, "getfreeport") {
+	} else if slices.Contains(os.Args, "getfreeport") {
 		port, err := GetFreePort()
 		if err != nil {
 			fmt.Println("Ошибка:", err)

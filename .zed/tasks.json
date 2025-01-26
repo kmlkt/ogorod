@@ -1,7 +1,7 @@
 [
   {
     "label": "Apply",
-    "command": "go run ."
+    "command": "go run . -- apply"
   },
   {
     "label": "Add",
