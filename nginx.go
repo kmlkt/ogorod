@@ -29,9 +29,9 @@ server {
 		`, serverName)
 		for _, site := range serverSites {
 			fmt.Fprintf(file, `
-	location %s {
+	location /%s {
 		alias %s;
-		try_files $uri $uri/ =404;
+		try_files $uri $uri.html $uri/ =404;
 	}
 `, site.URL, LocalPath(site))
 		}
