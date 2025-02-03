@@ -8,27 +8,27 @@ import (
 )
 
 func CliRun() {
-	if slices.Contains(os.Args, "githubtoken") {
-		GetToken()
+	commands := map[string]func(){
+		"githubtoken": func() { GetToken() },
+		"add":         func() { CliAdd() },
+		"apply":       func() { CliApply() },
+		"getports":    func() { PortScan() },
+		"getfreeport": func() {
+			port, err := GetFreePort()
+			if err != nil {
+				fmt.Println("Ошибка:", err)
+			} else {
+				fmt.Printf("Свободный порт: %d\n", port)
+			}
+		},
 	}
-	if slices.Contains(os.Args, "add") {
-		CliAdd()
-	}
-	if slices.Contains(os.Args, "apply") {
-		CliApply()
-	}
-	if slices.Contains(os.Args, "getports") {
-		PortScan()
-	}
-	if slices.Contains(os.Args, "getfreeport") {
-		port, err := GetFreePort()
-		if err != nil {
-			fmt.Println("Ошибка:", err)
+	for arg, handler := range commands {
+		if slices.Contains(os.Args, arg) {
+			handler()
+			return
 		} else {
-			fmt.Printf("Свободный порт: %d\n", port)
+			os.Exit(0)
 		}
-	} else {
-		os.Exit(1)
 	}
 }
 
