@@ -1,10 +1,6 @@
 [
   {
-    "label": "Apply",
-    "command": "go run . -- apply"
-  },
-  {
-    "label": "Add",
-    "command": "go run . -- add"
+    "label": "Start",
+    "command": "go build ."
   }
 ]

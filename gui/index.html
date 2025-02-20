@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/static/pico.green.min.css" />
+        <title>Ogorod</title>
+    </head>
+    <body>
+        <main class="grid">
+            <aside>
+                <nav>
+                    <ul>
+                        {{range .Config.Services}}
+                        <li><a href="/{{.ID}}">{{.Label}}</a></li>
+                        {{end}}
+                    </ul>
+                </nav>
+            </aside>
+            <div class="grid" style="grid-column: span 4">
+                {{if .Service}}
+                <div>
+                    <input
+                        type="text"
+                        value="{{.Service.Label}}"
+                        placeholder="Label"
+                        required
+                    />
+                    <input
+                        type="text"
+                        value="{{.Service.URL}}"
+                        placeholder="Deployment URL, e.g. docs.ogorod.dev/v1"
+                        required
+                    />
+                    <select value="{{.Service.Hosting}}">
+                        <option disabled value="">Hosting method</option>
+                        <option value="executable">Executable</option>
+                        <option value="static">Static site</option>
+                    </select>
+                    <input
+                        type="text"
+                        value="{{.Service.Repository}}"
+                        placeholder="Repository URL, e.g. github.com/kmlkt/ogorod"
+                        required
+                    />
+                    <input
+                        type="text"
+                        value="{{.Service.Branch}}"
+                        placeholder="Repository branch. Main or master by default"
+                    />
+                    <textarea
+                        type="text"
+                        placeholder="Build command, e.g. go build -o main or pip install -r requirements.txt"
+                    >
+{{.Service.BuildCmd}}</textarea
+                    >
+                    <textarea
+                        type="text"
+                        placeholder="Run command, e.g. ./main or python main.py"
+                    >
+{{.Service.RunCmd}}</textarea
+                    >
+                </div>
+                <div>
+                    <a href="{{.IframeURL}}" target="_blank">
+                        <article>
+                            <iframe
+                                src="{{.IframeURL}}"
+                                width="100%"
+                                frameborder="0"
+                                style="
+                                    pointer-events: none;
+                                    aspect-ratio: 16 / 9;
+                                "
+                            ></iframe>
+                        </article>
+                    </a>
+                </div>
+                {{else}}
+                <h1>Welcome to Ogorod</h1>
+                {{end}}
+            </div>
+        </main>
+    </body>
+</html>
