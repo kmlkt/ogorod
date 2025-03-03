@@ -18,12 +18,12 @@ const (
 	Executable    HostingMethod = "executable"
 )
 
-func (s Service) DoStuff(runNecessary bool) (Process, error) {
-	changed, path, err := s.download()
+func (s Service) DoStuff(runNecessary bool, buildNecessary bool) (Process, error) {
+	changed, path, err := s.download(buildNecessary)
 	if err != nil {
 		return Process{Path: path}, err
 	}
-	if s.BuildCmd != "" && changed {
+	if s.BuildCmd != "" && (changed || buildNecessary) {
 		err = s.build(path)
 		if err != nil {
 			return Process{}, err

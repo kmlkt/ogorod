@@ -5,6 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/static/pico.green.min.css" />
         <title>Ogorod</title>
+        <style>
+        body:has(select[name="Hosting"] option[value="static"]:checked){
+            textarea[name="RunCmd"] {
+                display: none;
+            }
+        }
+        </style>
     </head>
     <body>
         <main class="grid">
@@ -17,55 +24,61 @@
                     </ul>
                 </nav>
             </aside>
-            <div class="grid" style="grid-column: span 4">
+            <form class="grid" method="post" style="grid-column: span 4">
                 {{if .Service}}
                 <div>
                     <input
                         type="text"
+                        name="Label"
                         value="{{.Service.Label}}"
                         placeholder="Label"
                         required
                     />
                     <input
                         type="text"
+                        name="URL"
                         value="{{.Service.URL}}"
                         placeholder="Deployment URL, e.g. docs.ogorod.dev/v1"
                         required
                     />
-                    <select value="{{.Service.Hosting}}">
-                        <option disabled value="">Hosting method</option>
-                        <option value="executable">Executable</option>
-                        <option value="static">Static site</option>
+                    <select name="Hosting">
+                        <option value="executable" {{if eq .Service.Hosting "executable"}}selected{{end}}>Executable</option>
+                        <option value="static" {{if eq .Service.Hosting "static"}}selected{{end}}>Static site</option>
                     </select>
                     <input
                         type="text"
+                        name="Repository"
                         value="{{.Service.Repository}}"
                         placeholder="Repository URL, e.g. github.com/kmlkt/ogorod"
                         required
                     />
                     <input
                         type="text"
+                        name="Branch"
                         value="{{.Service.Branch}}"
                         placeholder="Repository branch. Main or master by default"
                     />
                     <textarea
+                        name="BuildCmd"
                         type="text"
                         placeholder="Build command, e.g. go build -o main or pip install -r requirements.txt"
                     >
 {{.Service.BuildCmd}}</textarea
                     >
                     <textarea
+                        name="RunCmd"
                         type="text"
                         placeholder="Run command, e.g. ./main or python main.py"
                     >
 {{.Service.RunCmd}}</textarea
                     >
+                    <button type="submit">SAVE</button>
                 </div>
                 <div>
                     <a href="{{.IframeURL}}" target="_blank">
                         <article>
                             <iframe
-                                src="{{.IframeURL}}"
+                                src="{{.IframeURL}}?prevent-cache={{.Random}}"
                                 width="100%"
                                 frameborder="0"
                                 style="
@@ -79,7 +92,7 @@
                 {{else}}
                 <h1>Welcome to Ogorod</h1>
                 {{end}}
-            </div>
+            </form>
         </main>
     </body>
 </html>

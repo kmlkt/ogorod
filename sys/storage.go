@@ -2,6 +2,7 @@ package sys
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/user"
@@ -19,6 +20,7 @@ import (
 const AppTag = "ogorod"
 
 var SiteDir string
+var LogDir string
 
 func init() {
 	userDir, err := os.UserHomeDir()
@@ -35,9 +37,11 @@ func init() {
 	}
 	SiteDir = filepath.Join(userDir, AppTag)
 	os.MkdirAll(SiteDir, 0750)
+	LogDir = filepath.Join(SiteDir, "logs")
+	os.MkdirAll(LogDir, 0750)
 }
 
-func (s Service) download() (bool, string, error) {
+func (s Service) download(necessary bool) (bool, string, error) {
 	lastLocal, currentPath, err := s.lastLocalCommit()
 	slog.Debug("Last local commit", "id", s.ID, "repo", s.Repository, "commit", lastLocal)
 	if err != nil {
@@ -49,7 +53,7 @@ func (s Service) download() (bool, string, error) {
 		return false, "", err
 	}
 
-	if lastLocal == lastRemote {
+	if lastLocal == lastRemote && !necessary {
 		return false, currentPath, nil
 	}
 
@@ -155,7 +159,7 @@ func ClearStorage(pm ProcessMap) error {
 	for _, dir := range dirs {
 		dirPath := filepath.Join(SiteDir, dir.Name())
 		_, keep := toKeep[dirPath]
-		if !keep {
+		if !keep && dirPath != LogDir {
 			err := os.RemoveAll(dirPath)
 			if err != nil {
 				return err
@@ -164,4 +168,20 @@ func ClearStorage(pm ProcessMap) error {
 		}
 	}
 	return nil
+}
+
+func (s Service) LogFileWriter(mode string) (io.Writer, error) {
+	file, err := os.OpenFile(filepath.Join(LogDir, s.ID.String()+"-"+mode+".txt"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
+func (s Service) LogFileReader(mode string) (*os.File, error) {
+	file, err := os.Open(filepath.Join(LogDir, s.ID.String()+"-"+mode+".txt"))
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
 }

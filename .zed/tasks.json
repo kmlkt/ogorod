@@ -1,6 +1,6 @@
 [
   {
     "label": "Start",
-    "command": "go build ."
+    "command": "go build . && ./ogorod"
   }
 ]

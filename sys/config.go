@@ -2,7 +2,10 @@ package sys
 
 import (
 	"encoding/json"
+	"log/slog"
 	"os"
+	"slices"
+	"sync"
 )
 
 type Config struct {
@@ -32,13 +35,13 @@ func (c Config) Save() error {
 	return os.WriteFile(ConfigPath, file, 0666)
 }
 
-func (c Config) DoStuff(pm *ProcessMap, register func(ProcessMap)) error {
+func (c Config) DoStuff(pm *ProcessMap, changed []ShortID, register func(ProcessMap)) error {
 	firstTime := false
 	if *pm == nil {
 		*pm = make(ProcessMap)
 		firstTime = true
 	}
-	newPm, err := c.apply(firstTime)
+	newPm, err := c.apply(firstTime, changed)
 	if err != nil {
 		return err
 	}
@@ -49,15 +52,25 @@ func (c Config) DoStuff(pm *ProcessMap, register func(ProcessMap)) error {
 	return nil
 }
 
-func (c Config) apply(firstTime bool) (ProcessMap, error) {
+func (c Config) apply(firstTime bool, changed []ShortID) (ProcessMap, error) {
 	pm := make(ProcessMap)
+	wg := sync.WaitGroup{}
+	wg.Add(len(c.Services))
 	for _, service := range c.Services {
-		process, err := service.DoStuff(firstTime)
-		if err != nil {
-			return pm, err
-		}
+		go func() {
+			process, err := service.DoStuff(firstTime || slices.Contains(changed, service.ID),
+				slices.Contains(changed, service.ID))
+			if err != nil {
+				slog.Error("Service failed", "service", service.ID, "error", err)
+				wg.Done()
+				return
+			}
+			slog.Debug("Service done", "service", service.ID, "process", process)
 
-		pm[service.ID] = process
+			pm[service.ID] = process
+			wg.Done()
+		}()
 	}
+	wg.Wait()
 	return pm, nil
 }

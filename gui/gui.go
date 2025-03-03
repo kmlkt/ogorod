@@ -2,9 +2,7 @@ package gui
 
 import (
 	"embed"
-	"log/slog"
 	"net/http"
-	"strings"
 	"text/template"
 
 	"github.com/kmlkt/ogorod/sys"
@@ -20,45 +18,17 @@ var staticFS embed.FS
 type BaseView struct {
 	Config     *sys.Config
 	ProcessMap *sys.ProcessMap
+	Apply      Applier
 }
 
-func GuiHandler(c *sys.Config, pm *sys.ProcessMap, apply func() error) http.Handler {
+type Applier func(changed []sys.ShortID) error
+
+func GuiHandler(c *sys.Config, pm *sys.ProcessMap, apply Applier) http.Handler {
 	mux := http.NewServeMux()
-	view := BaseView{Config: c, ProcessMap: pm}
-	mux.HandleFunc("/", view.index)
-	mux.HandleFunc("/{service_id}", view.index)
+	view := BaseView{Config: c, ProcessMap: pm, Apply: apply}
+	mux.HandleFunc("/", view.serviceView)
+	mux.HandleFunc("/{service_id}", view.serviceView)
+	mux.HandleFunc("/logs/{service_id}", view.logView)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 	return mux
-}
-
-type ServiceView struct {
-	BaseView
-	Service *sys.Service
-}
-
-func (v ServiceView) IframeURL() string {
-	if v.Service == nil {
-		return ""
-	}
-	result := v.Service.URL
-	if strings.HasPrefix(result, "/") {
-		result = "http://localhost:8080" + result // TODO rm hardcode
-	}
-	if !strings.HasPrefix(result, "http") {
-		result = "https://" + result
-	}
-	return result
-}
-
-func (v BaseView) index(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("service_id")
-	slog.Debug("index", "service_id", id)
-	var currentService *sys.Service
-	for _, service := range v.Config.Services {
-		if service.ID.String() == id {
-			currentService = &service
-			break
-		}
-	}
-	templates.ExecuteTemplate(w, "index.html", ServiceView{v, currentService})
 }

@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-func UseConfig(config Config, pm *ProcessMap, server *http.Server) error {
+func UseConfig(config Config, pm *ProcessMap, server *http.Server, changed []ShortID) error {
 	mux := http.NewServeMux()
-	err := config.DoStuff(pm, func(newPm ProcessMap) {
+	err := config.DoStuff(pm, changed, func(newPm ProcessMap) {
 		for _, service := range config.Services {
 			mux.Handle(service.URL, http.StripPrefix(service.URL, service.Handler(newPm[service.ID])))
 		}

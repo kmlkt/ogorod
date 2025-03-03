@@ -33,12 +33,15 @@ func run() error {
 		sys.GracefulShutdown(&pm)
 		httpServer.Shutdown(nil)
 	}()
-	apply := func() error {
-		err := sys.UseConfig(config, &pm, &httpServer)
+	apply := func(changed []sys.ShortID) error {
+		err = sys.UseConfig(config, &pm, &httpServer, changed)
 		if err != nil {
 			return err
 		}
-
+		err := config.Save()
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 	guiServer := http.Server{
@@ -46,7 +49,7 @@ func run() error {
 		Handler: gui.GuiHandler(&config, &pm, apply),
 	}
 	go guiServer.ListenAndServe()
-	err = apply()
+	err = apply([]sys.ShortID{})
 	if err != nil {
 		return err
 	}

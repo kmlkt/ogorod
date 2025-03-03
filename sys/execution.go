@@ -20,12 +20,18 @@ func init() {
 }
 
 func (s Service) build(path string) error {
-	cmd := exec.Command(Shell, s.BuildCmd)
+	cmd := exec.Command("/bin/sh", "-c", s.BuildCmd)
 	cmd.Dir = path
+	logFile, err := s.LogFileWriter("build")
+	if err != nil {
+		return err
+	}
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
 	if cmd.Err != nil {
 		return cmd.Err
 	}
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return err
 	}
@@ -41,7 +47,13 @@ func (s Service) run(path string, port int) (error, int) {
 	cmd.SysProcAttr = IndependentProcessAttr
 	cmd.Env = append(os.Environ(), "PORT="+strconv.Itoa(port))
 	cmd.Dir = path
-	err := cmd.Start()
+	logFile, err := s.LogFileWriter("run")
+	if err != nil {
+		return err, cmd.Process.Pid
+	}
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
+	err = cmd.Start()
 	if err != nil {
 		return err, cmd.Process.Pid
 	}
