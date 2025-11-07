@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Debug",
+    "adapter": "Delve",
+    "mode": "debug",
+    "request": "launch",
+    "program": "${ZED_WORKTREE_ROOT}/cmd",
+    "cwd": "${ZED_WORKTREE_ROOT}/bin"
+  }
+]
