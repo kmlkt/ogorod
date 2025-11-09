@@ -1,4 +1,4 @@
-package ogorod
+package abs
 
 type ServiceState int8
 
